@@ -1,0 +1,339 @@
+{
+ "version": "1.0",
+ "note": "21 hook formulas for YouTube. A YouTube hook is the first 15 seconds and it does three jobs: confirm the click the title promised, raise a question the viewer cannot close, and prove the payoff exists. A hook that only does the third is a summary and it leaks. Every formula here carries the shape, a worked example, the failure mode, and the patterns hookscore.py classifies transcribed speech against.",
+ "rules": [
+  "Confirm the title in the first sentence. A hook that ignores its own title is why people leave at 0:08.",
+  "One idea. A hook carrying two promises keeps neither.",
+  "Specific beats big. '400 to 200,000 in seven months' outperforms 'massive growth'.",
+  "Show the artifact inside 20 seconds if you promised one.",
+  "Never open with who you are. The subscribe pitch has not been earned yet."
+ ],
+ "telugu_rules": {
+  "question_starts": ["ఎందుకు", "ఎలా", "ఏమి", "ఏమిటి", "ఏమేమి", "ఏది", "ఏవి", "ఎవరు", "ఎవరికి", "ఎప్పుడు", "ఎక్కడ", "ఎంత"],
+  "question_endings": ["తెలుసా", "చూశారా", "చూసుకున్నారా", "వెళ్లారా", "వెళ్తున్నారా", "పోతున్నారా", "వస్తున్నారా", "దర్శించారా", "జపిస్తున్నారా", "వింటున్నారా", "చదువుతున్నారా", "చూస్తున్నారా", "తెలుసుకుంటున్నారా", "వచ్చారా", "చేస్తారా", "చెప్పారా", "ఉందా", "ఉన్నాయా", "కావాలా", "చేయాలా", "చేయాలి", "చేసుకోవాలి", "తీసుకెళ్లాలి", "చేయగలరా", "చెప్పగలరా", "జరిగిందా", "వస్తుందా", "అవుతుందా"],
+  "number_words": ["సున్నా", "ఒకటి", "ఒక", "రెండు", "మూడు", "నాలుగు", "ఐదు", "ఆరు", "ఏడు", "ఎనిమిది", "తొమ్మిది", "పది", "వంద", "వెయ్యి"],
+  "review_cues": ["తప్పక నెరవేరుతుంది", "ఖచ్చితంగా నెరవేరుతుంది", "రోగం నయం", "ధనం వస్తుంది", "అద్భుతంగా మారుతుంది"],
+  "statistic_units": ["శాతం", "మంది", "కుటుంబాలు", "సార్లు", "రోజులు", "వారాలు", "నెలలు", "సంవత్సరాలు"],
+  "shorts_word_band": [4, 14]
+ },
+ "hooks": [
+  {
+   "id": "the-statistic",
+   "name": "The Statistic",
+   "name_te": "గణాంక హుక్",
+   "example_te": "ఈ పఠనం రోజుకు ఐదు నిమిషాలు పడుతుంది—దాని భావాన్ని కలిసి చూద్దాం.",
+   "match_te": ["(?:\\d+\\s*%|\\d+\\s*(?:మంది|కుటుంబాలు|సార్లు)|\\d+\\s*(?:రోజులు|వారాలు|నెలలు|సంవత్సరాలు)\\s*(?:లో|లోనే)\\s*\\d+)"] ,
+   "shape": "A number the viewer did not know, stated flat, then the consequence.",
+   "example": "97% of the people who start a channel quit before video 30. Here is what the other 3% do differently.",
+   "fails_when": "Dies if the number is vague or unverifiable. Say the source out loud.",
+   "match": [
+    "\\b\\d+(\\.\\d+)?\\s?%",
+    "\\b\\d+ (out of|in) \\d+\\b",
+    "\\b\\d{2,}(,\\d{3})+\\b"
+   ]
+  },
+  {
+   "id": "someone-elses-result",
+   "name": "Someone Else's Result",
+   "name_te": "ఇతరుల అనుభవం",
+   "example_te": "ఒక భక్తుడు తన అనుభవాన్ని ఇలా వివరించారు—ఆ అనుభవం వెనుక ఉన్న భావం ఏమిటో చూద్దాం.",
+   "match_te": ["(?:ఒక భక్తుడు|ఒక సాధకుడు|వారి అనుభవం|అనుభవాన్ని)"],
+   "shape": "A named person's outcome, then the mechanism.",
+   "example": "This channel went from 400 subscribers to 200,000 in seven months on one format. I mapped it.",
+   "fails_when": "Do not invent the number. If you cannot name the channel, use a different formula.",
+   "match": [
+    "\\bthis (channel|guy|creator|account)\\b",
+    "\\bwent from .* to\\b",
+    "\\bin (a|one|two|three|\\d+) (week|month|year)s?\\b"
+   ]
+  },
+  {
+   "id": "the-mistake",
+   "name": "The Mistake",
+   "name_te": "సాధారణ పొరపాటు",
+   "example_te": "ఈ శ్లోకాన్ని అర్థం తెలియకుండా చదువుతున్నారా? దాని భావాన్ని ముందుగా తెలుసుకుందాం.",
+   "match_te": ["(?:పొరపాటు|తప్పు|తెలియకుండా|మర్చిపోకండి)"],
+   "shape": "Name the error the viewer is probably making right now.",
+   "example": "Your first 30 seconds are why nobody finishes your videos. It is not the topic.",
+   "fails_when": "Only works if the mistake is common and the viewer can check it in one second.",
+   "match": [
+    "\\byou('re| are) (probably |still )?(doing|making)\\b",
+    "\\bthe (mistake|reason) (everyone|most people|nobody)\\b",
+    "\\bstop (doing )?\\b"
+   ]
+  },
+  {
+   "id": "contrarian-flip",
+   "name": "Contrarian Flip",
+   "name_te": "మరో కోణం",
+   "example_te": "భక్తి అంటే కేవలం ఆచారం మాత్రమేనా? ఈ కథ చూపించే మరో కోణాన్ని చూద్దాం.",
+   "match_te": ["(?:కేవలం .* మాత్రమే కాదు|అందరూ .* అనుకుంటారు|అలా కాదు|మరో కోణం)"],
+   "shape": "State the accepted advice, then reject it.",
+   "example": "Everyone says post daily. I posted once a week for a year and tripled the channel.",
+   "fails_when": "Needs evidence in the next 15 seconds or it reads as contrarian for its own sake.",
+   "match": [
+    "\\beveryone (says|thinks|tells you)\\b",
+    "\\bis (actually )?wrong\\b",
+    "\\bnobody (tells|talks about)\\b"
+   ]
+  },
+  {
+   "id": "the-reveal",
+   "name": "The Reveal",
+   "name_te": "వెలికితీత",
+   "example_te": "ఈ శ్లోకంలో దాగి ఉన్న ముఖ్యమైన భావాన్ని ఇప్పుడు చూద్దాం.",
+   "match_te": ["(?:దాగి ఉన్న|వెలికితీస్తా|చూపిస్తా|భావాన్ని.*చూద్దాం)"],
+   "shape": "Promise a specific thing will be shown, then show it.",
+   "example": "I am going to show you the exact prompt, on screen, that wrote this video.",
+   "fails_when": "You have to actually show it, early. A reveal at 8:00 is a retention cliff at 1:00.",
+   "match": [
+    "\\bI('m| am) going to show you\\b",
+    "\\bhere('s| is) (the|exactly)\\b",
+    "\\bon screen\\b"
+   ]
+  },
+  {
+   "id": "the-superlative",
+   "name": "The Superlative",
+   "name_te": "ప్రత్యేకమైనది",
+   "example_te": "ఈ కథలో మనసును ఆలోచింపజేసే ఒక ముఖ్యమైన సందేశం ఉంది.",
+   "match_te": ["(?:అత్యంత|ప్రత్యేకమైన|ఒక్కటే)"],
+   "shape": "The single best/worst/fastest of a category.",
+   "example": "This is the fastest way to turn one long video into thirty Shorts.",
+   "fails_when": "Superlatives are cheap. Earn it by naming what it beat.",
+   "match": [
+    "\\bthe (best|worst|fastest|easiest|only)\\b",
+    "\\bnumber one\\b"
+   ]
+  },
+  {
+   "id": "the-clock",
+   "name": "The Clock",
+   "name_te": "సమయ పరిమితి",
+   "example_te": "ఈ వీడియో ముగిసేలోపు ఈ ప్రార్థనలోని ప్రధాన భావాన్ని తెలుసుకుందాం.",
+   "match_te": ["(?:ఈ వీడియో ముగిసేలోపు|తర్వాతి \\d+ నిమిషాల్లో|\\d+ నిమిషాల్లో)"],
+   "shape": "Bound the payoff in time.",
+   "example": "In the next six minutes you will have a working title, thumbnail and script for your next video.",
+   "fails_when": "The clock has to be true. Overrun it and the next video's hook is not believed.",
+   "match": [
+    "\\bin (the next )?\\d+ (seconds|minutes|hours)\\b",
+    "\\bby the end of this video\\b",
+    "\\bunder \\d+\\b"
+   ]
+  },
+  {
+   "id": "i-tried-it",
+   "name": "I Tried It",
+   "name_te": "నేను ప్రయత్నించాను",
+   "example_te": "నేను ఈ పారాయణాన్ని ఒక వారం అభ్యసించాను; నా అనుభవాన్ని నిజాయితీగా పంచుకుంటాను.",
+   "match_te": ["(?:నేను .* ప్రయత్నించాను|నేను .* అభ్యసించాను|నేను .* చదివాను)"],
+   "shape": "First-person experiment with a stated cost.",
+   "example": "I let an AI run my channel for 30 days. I did not touch the uploads.",
+   "fails_when": "Needs a real cost - time, money, risk - or there is no stake.",
+   "match": [
+    "\\bI (tried|spent|tested|let|gave)\\b",
+    "\\bfor \\d+ (days|weeks|months)\\b",
+    "\\bso you don'?t have to\\b"
+   ]
+  },
+  {
+   "id": "the-question",
+   "name": "The Question",
+   "name_te": "ప్రశ్న",
+   "example_te": "ఈ కథలోని సందేశం మన రోజువారీ జీవితానికి ఎలా సంబంధిస్తుంది?",
+   "match_te": ["^(?:ఎందుకు|ఎలా|ఏమిటి|ఏమి|ఏమేమి|ఎప్పుడు|ఎక్కడ|ఎవరు|ఏది|ఏవి|మీకు .* తెలుసా)"],
+   "shape": "Ask the exact question the viewer typed into search.",
+   "example": "Why do your videos die at 30 seconds when the topic is fine?",
+   "fails_when": "Must be the viewer's question, not yours. Pull it from your own comments.",
+   "match": [
+    "^(why|how|what|when|should|can|do|does|is)\\b",
+    "\\?\\s*$"
+   ]
+  },
+  {
+   "id": "the-before-after",
+   "name": "Before and After",
+   "name_te": "ముందు-తర్వాత",
+   "example_te": "ఈ కథ వినే ముందు నా ఆలోచన ఇలా ఉండేది; దాని భావం తెలుసుకున్న తర్వాత ఇలా మారింది.",
+   "match_te": ["(?:ముందు .* తర్వాత|ఇంతకుముందు .* ఇప్పుడు)"],
+   "shape": "Two states, one cut between them.",
+   "example": "This was my thumbnail. This is my thumbnail now. Same video, four times the click-through.",
+   "fails_when": "Only works with a visual. Do not use it on a talking-head-only video.",
+   "match": [
+    "\\bbefore\\b.*\\bafter\\b",
+    "\\bthis was\\b.*\\bthis is\\b",
+    "\\bused to\\b"
+   ]
+  },
+  {
+   "id": "the-teardown",
+   "name": "The Teardown",
+   "name_te": "వివరణాత్మక విశ్లేషణ",
+   "example_te": "ఈ శ్లోకంలోని ప్రతి పాదాన్ని విడిగా చదివి దాని అర్థాన్ని పరిశీలిద్దాం.",
+   "match_te": ["(?:ప్రతి పాదం|పదేపదే|విడిగా .* అర్థం|విశ్లేషిద్దాం)"],
+   "shape": "Take a real thing apart in public.",
+   "example": "I pulled the nine most-viewed AI videos of the month and broke down what the titles share.",
+   "fails_when": "Name what you pulled and how many. A teardown of one example is an anecdote.",
+   "match": [
+    "\\b(broke|break|breaking) (it )?down\\b",
+    "\\bteardown\\b",
+    "\\banalys(ed|ed|is|e)\\b",
+    "\\bI pulled\\b"
+   ]
+  },
+  {
+   "id": "the-stack",
+   "name": "The Stack",
+   "name_te": "రెండు అంశాల కలయిక",
+   "example_te": "శ్లోక పఠనం మరియు సరళమైన తెలుగు భావం కలిపి ఈ రోజు తెలుసుకుందాం.",
+   "match_te": ["(?:మరియు .* కలిపి|తో పాటు|రెండింటినీ|కలిపి చూద్దాం)"],
+   "shape": "Two named tools combined into one outcome.",
+   "example": "Claude plus your YouTube Studio export gives you next week's upload schedule in one prompt.",
+   "fails_when": "Both tools must be nameable and the outcome must need both.",
+   "match": [
+    "\\b\\w+ (plus|\\+) \\w+\\b",
+    "\\bcombine\\b",
+    "\\btogether\\b"
+   ]
+  },
+  {
+   "id": "the-warning",
+   "name": "The Warning",
+   "name_te": "జాగ్రత్త సూచన",
+   "example_te": "ఈ మంత్రం గురించి హామీగా చెప్పే ముందు, సంప్రదాయ మూలాన్ని పరిశీలిద్దాం.",
+   "match_te": ["(?:జాగ్రత్త|హామీగా చెప్పే ముందు|ముందుగా .* పరిశీలించండి|తప్పక తెలుసుకోండి)"],
+   "shape": "A cost the viewer is about to pay.",
+   "example": "Do not upload another video until you check this one setting.",
+   "fails_when": "If the cost is small the hook is a lie. Reserve it.",
+   "match": [
+    "\\bdo not\\b",
+    "\\bdon'?t (upload|post|publish|start)\\b",
+    "\\bbefore you\\b",
+    "\\bstop\\b"
+   ]
+  },
+  {
+   "id": "the-list",
+   "name": "The List",
+   "name_te": "సంఖ్యతో కూడిన జాబితా",
+   "example_te": "ఈ కథలో గుర్తుంచుకోవాల్సిన మూడు ముఖ్యమైన అంశాలు ఇవి.",
+   "match_te": ["(?:మూడు|రెండు|ఐదు|ఏడు|\\d+) (?:విషయాలు|అంశాలు|పాఠాలు|కారణాలు|చిట్కాలు|దశలు)"],
+   "shape": "A counted set, with the count in the first line.",
+   "example": "Seven things I would do differently if I started a channel in 2026.",
+   "fails_when": "The count must be exact and every item must be different in kind.",
+   "match": [
+    "^\\d+ \\w+",
+    "\\b(here are|these are) \\d+\\b"
+   ]
+  },
+  {
+   "id": "the-receipt",
+   "name": "The Receipt",
+   "name_te": "ఆధారం చూపించడం",
+   "example_te": "ఈ గ్రంథంలోని పాదాన్ని తెరపై చూపించి, దాని భావాన్ని వివరిస్తాను.",
+   "match_te": ["(?:గ్రంథంలోని .* చూపి|మూలాన్ని చూపి|ఆధారం|తెరపై చూపి)"],
+   "shape": "Show the artifact first, explain second.",
+   "example": "This is the analytics page. This video did 40% of the channel's watch time. Here is why.",
+   "fails_when": "Requires a real screenshot. A described receipt is not a receipt.",
+   "match": [
+    "\\bthis is (the|my)\\b",
+    "\\bscreenshot\\b",
+    "\\bproof\\b",
+    "\\breceipts?\\b"
+   ]
+  },
+  {
+   "id": "the-insider",
+   "name": "The Insider",
+   "name_te": "సంప్రదాయ సమాచారం",
+   "example_te": "ఈ ఆలయ సంప్రదాయంలో ఈ ఆచారానికి చెప్పే అర్థం ఏమిటో మూలంతో చూద్దాం.",
+   "match_te": ["(?:సంప్రదాయంలో|ఆచారానికి .* అర్థం|చాలామందికి తెలియని|మూలగ్రంథం)"],
+   "shape": "Information from inside a system.",
+   "example": "YouTube tells you which videos are underperforming. Almost nobody opens the report.",
+   "fails_when": "Do not claim insider access you do not have.",
+   "match": [
+    "\\b(nobody|almost nobody|most people) (knows?|opens?|uses?)\\b",
+    "\\bhidden\\b",
+    "\\bburied\\b"
+   ]
+  },
+  {
+   "id": "the-impossible",
+   "name": "The Impossible Claim",
+   "name_te": "ఆశ్చర్యకరమైన వాదన",
+   "example_te": "ఈ చిన్న కథలోని ఒక ప్రశ్న మన రోజువారీ నిర్ణయాలను మళ్లీ ఆలోచింపజేస్తుంది.",
+   "match_te": ["(?:నమ్మశక్యం కాని|అసాధ్యంగా అనిపించే|ఒక్క కథ .* ఆలోచింపజేస్తుంది)"],
+   "shape": "State something that sounds untrue, then prove it.",
+   "example": "You can write, title, thumbnail and schedule a week of videos without opening a single editor.",
+   "fails_when": "The proof has to start within 20 seconds or it reads as clickbait.",
+   "match": [
+    "\\bwithout\\b",
+    "\\bnever\\b",
+    "\\bin one\\b",
+    "\\bzero\\b"
+   ]
+  },
+  {
+   "id": "the-comparison",
+   "name": "The Comparison",
+   "name_te": "పోలిక",
+   "example_te": "ఈ రెండు ప్రార్థనల భావాలు ఎలా భిన్నంగా ఉన్నాయో మూలాలను చూసి పోల్చుదాం.",
+   "match_te": ["(?:రెండు .* పోల్చ|మధ్య తేడా|ఏది .* అనే పోలిక|భిన్నంగా ఉన్నాయో)"],
+   "shape": "Two named options, one winner.",
+   "example": "I wrote the same video three ways. One of them held 62% and the other two did not.",
+   "fails_when": "Say the losing option out loud. A comparison with no loser is an advert.",
+   "match": [
+    "\\bvs\\.?\\b",
+    "\\bversus\\b",
+    "\\bwhich (one )?(is|wins)\\b",
+    "\\bsame .* (three|two) ways\\b"
+   ]
+  },
+  {
+   "id": "the-origin",
+   "name": "The Origin",
+   "name_te": "మూలం",
+   "example_te": "ఈ పండుగ ఆచారం ఎలా ప్రారంభమైందో అందుబాటులో ఉన్న మూలాల ఆధారంగా చూద్దాం.",
+   "match_te": ["(?:ఎలా ప్రారంభమైంది|మూలం ఏమిటి|ఎక్కడి నుంచి వచ్చింది|చరిత్ర ఏమిటి)"],
+   "shape": "Where a result actually came from.",
+   "example": "Every video on this channel starts in the same 12-line file. Here it is.",
+   "fails_when": "Works once per channel. It is a reveal about you, and you only have one.",
+   "match": [
+    "\\bevery (video|post) .* starts\\b",
+    "\\bit all (starts|started)\\b",
+    "\\bthe (real )?reason\\b"
+   ]
+  },
+  {
+   "id": "the-deadline",
+   "name": "The Deadline",
+   "name_te": "కాలానుగుణ అంశం",
+   "example_te": "ఈ పర్వదినానికి ముందు ఈ సంప్రదాయం గురించి తెలుసుకోవాల్సిన విషయం ఇది.",
+   "match_te": ["(?:ఈ రోజు|ఈ నెల|పర్వదినానికి ముందు|పండుగకు ముందు)"],
+   "shape": "Something is changing on a date.",
+   "example": "The old description format stops mattering this month. Here is what replaces it.",
+   "fails_when": "Only use with a real, checkable date. This is the fastest formula to lose trust with.",
+   "match": [
+    "\\b(this|next) (week|month|year)\\b",
+    "\\bis changing\\b",
+    "\\bno longer\\b",
+    "\\bas of\\b"
+   ]
+  },
+  {
+   "id": "the-direct-address",
+   "name": "The Direct Address",
+   "name_te": "ప్రేక్షకుడిని నేరుగా సంబోధించడం",
+   "example_te": "మీరు ఈ శ్లోకం వింటూ ఉంటే, దాని సరళమైన భావాన్ని ఇప్పుడు తెలుసుకుందాం.",
+   "match_te": ["^(?:మీరు|మీకు|మీ ఇంట్లో|భక్తులారా)"],
+   "shape": "Name the exact viewer in the first six words.",
+   "example": "If you have under a thousand subscribers, this is the only video you need this week.",
+   "fails_when": "Narrow beats broad. 'If you make videos' addresses nobody.",
+   "match": [
+    "^if you\\b",
+    "\\bfor (anyone|everyone|people) who\\b",
+    "\\byou specifically\\b"
+   ]
+  }
+ ]
+}

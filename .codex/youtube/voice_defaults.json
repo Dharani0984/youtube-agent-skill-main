@@ -1,0 +1,17 @@
+{
+  "language": "te-IN",
+  "style": "తెలుగు భక్తి కథనం",
+  "dialect": "సాధారణంగా అర్థమయ్యే ఆధునిక తెలుగు; ప్రాంతీయ మాండలికం ఊహించవద్దు",
+  "tone": "గౌరవప్రదం, ప్రశాంతం, ఆప్యాయంగా, అతిశయోక్తి లేకుండా",
+  "viewer_address": "మీరు",
+  "sentence_style": "చిన్నగా, పలకడానికి సులభంగా ఉండే వాక్యాలు",
+  "tts_model": "ai4bharat/indic-parler-tts",
+  "tts_speaker_default": "Prakash",
+  "tts_delivery": "Calm, warm, reverent Telugu devotional narration; clear diction, moderate pace, restrained emotion.",
+  "guardrails": [
+    "శాస్త్రం, చరిత్ర, తేదీ, సంఖ్య లేదా శ్లోకాన్ని ఆధారం లేకుండా కల్పించవద్దు.",
+    "భక్తి విశ్వాసాన్ని అందరికీ హామీగా చూపవద్దు.",
+    "సంప్రదాయం స్పష్టంగా లేకపోతే కల్పించకుండా అడగండి.",
+    "వైద్యం, సంపద, భద్రత లేదా అద్భుత ఫలితాలను వాగ్దానం చేయవద్దు."
+  ]
+}

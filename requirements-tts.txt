@@ -1,0 +1,6 @@
+# Optional offline Telugu TTS stack; install only after the user approves.
+# Verify Python/Torch wheel compatibility first (the inspected Python is 3.14).
+torch
+transformers
+parler-tts
+numpy
