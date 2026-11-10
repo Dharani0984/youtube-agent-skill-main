@@ -95,15 +95,20 @@ def _post_form(url, body):
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         error_code = "unknown_error"
+        error_description = ""
         try:
             details = json.loads(exc.read().decode("utf-8"))
             candidate = details.get("error")
             if isinstance(candidate, str) and candidate.replace("_", "").isalnum():
                 error_code = candidate[:64]
+            description = details.get("error_description")
+            if isinstance(description, str):
+                error_description = " ".join(description.split())[:180]
         except (UnicodeDecodeError, json.JSONDecodeError, AttributeError):
             pass
+        detail = f": {error_description}" if error_description else ""
         raise RuntimeError(
-            f"Google OAuth token అభ్యర్థన విఫలమైంది (HTTP {exc.code}, {error_code}); రహస్యాలు చూపించలేదు"
+            f"Google OAuth token అభ్యర్థన విఫలమైంది (HTTP {exc.code}, {error_code}{detail}); రహస్యాలు చూపించలేదు"
         ) from None
     except (urllib.error.URLError, json.JSONDecodeError):
         raise RuntimeError(

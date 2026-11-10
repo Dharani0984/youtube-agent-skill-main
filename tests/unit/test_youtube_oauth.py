@@ -25,7 +25,8 @@ class YouTubeOAuthTests(unittest.TestCase):
     def test_http_oauth_error_code_is_reported_without_response_details(self):
         body = json.dumps({
             "error": "invalid_client",
-            "error_description": "sensitive response detail",
+            "error_description": "invalid client configuration",
+            "debug": "must not be displayed",
         }).encode("utf-8")
         response = io.BytesIO(body)
         error = urllib.error.HTTPError(
@@ -37,7 +38,8 @@ class YouTubeOAuthTests(unittest.TestCase):
                     youtube.TOKEN_URL,
                     b"client_id=desktop-client-id&code=authorization-code",
                 )
-        self.assertNotIn("sensitive response detail", str(caught.exception))
+        self.assertIn("invalid client configuration", str(caught.exception))
+        self.assertNotIn("must not be displayed", str(caught.exception))
         self.assertNotIn("authorization-code", str(caught.exception))
 
 
