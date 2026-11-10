@@ -9,6 +9,7 @@ from unittest.mock import patch
 from telugu_shorts.approval import require_current_approval, save_approval
 from telugu_shorts.captions import make_srt, make_timed_srt
 from telugu_shorts.pipeline import prepare_project
+from telugu_shorts import pipeline as pipeline_module
 from telugu_shorts.render import preflight, quality_report, render_project
 from telugu_shorts import render as render_module
 from telugu_shorts.visuals import render_ppm
@@ -127,7 +128,9 @@ class LocalPipelineTests(unittest.TestCase):
             filter_graph = (project / "render-filter.txt").read_text(encoding="utf-8")
             self.assertIn("xfade=transition=fade", filter_graph)
             self.assertIn("subtitles=filename=", filter_graph)
-            self.assertIn("-filter_complex_script", captured[0])
+            self.assertIn("-filter_complex", captured[0])
+            graph_arg = captured[0][captured[0].index("-filter_complex") + 1]
+            self.assertIn("subtitles=filename=", graph_arg)
             self.assertIn("-n", captured[0])
             self.assertTrue((project / "subtitles-timed.srt").is_file())
 
@@ -140,9 +143,26 @@ class LocalPipelineTests(unittest.TestCase):
             self.assertTrue(Path(ffmpeg).is_file()); self.assertTrue(Path(ffprobe).is_file())
 
     def test_missing_tts_dependencies_are_reported_without_installing(self):
-        with patch.object(tts, "dependencies_available", return_value=False):
-            with self.assertRaisesRegex(RuntimeError, "auto-install"):
+        unavailable = {"available": False, "error": "Missing packages: torch"}
+        with patch.object(tts, "dependency_status", return_value=unavailable):
+            with self.assertRaisesRegex(RuntimeError, "Missing packages: torch"):
                 tts.synthesize_telugu("తెలుగు భక్తి కథనం", "never-created.wav")
+
+    def test_parler_uses_distinct_transcript_and_description_tokenizers(self):
+        calls = []
+        class FakeTokenizer:
+            @classmethod
+            def from_pretrained(cls, name, **kwargs):
+                calls.append((name, kwargs))
+                return object()
+        transcript, description = tts._load_tokenizers(
+            "ai4bharat/indic-parler-tts", "description-encoder", FakeTokenizer
+        )
+        self.assertIsNot(transcript, description)
+        self.assertEqual(calls, [
+            ("ai4bharat/indic-parler-tts", {"padding_side": "left"}),
+            ("description-encoder", {}),
+        ])
 
     def test_telugu_voice_defaults_load_and_validate(self):
         profile = load_voice_defaults()
@@ -165,8 +185,9 @@ class LocalPipelineTests(unittest.TestCase):
     def test_requesting_tts_without_dependencies_creates_no_partial_project(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "shorts"
-            with patch.object(tts, "dependencies_available", return_value=False):
-                with self.assertRaisesRegex(RuntimeError, "auto-install"):
+            unavailable = {"available": False, "error": "torch import failed: blocked"}
+            with patch.object(pipeline_module, "dependency_status", return_value=unavailable):
+                with self.assertRaisesRegex(RuntimeError, "torch import failed"):
                     prepare_project(sample(), output, make_voice=True)
             self.assertFalse(output.exists())
 

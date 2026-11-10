@@ -10,11 +10,14 @@
 - Offline generated Telugu narration uses the AI4Bharat Indic Parler-TTS
   checkpoint. Telugu is listed among its supported languages; its suggested
   Telugu speakers include Prakash and Lalitha. The model has about 0.9B
-  parameters and its first inference downloads weights. Python packages are
-  listed in `requirements-tts.txt`, but the TTS stack was not installed or
-  executed in this repository. Check Python/PyTorch wheel compatibility and
-  available RAM/VRAM before installing or downloading the model. CPU is the
-  default and may be slow. A creator-recorded WAV can be used instead.
+  parameters and its first inference downloads weights. The installed local
+  runtime used Python 3.13, PyTorch 2.15, Transformers 4.46.1, and Parler-TTS
+  0.2.2; the pinned requirements are in `requirements-tts.txt`. Before running
+  inference, the creator must sign in to Hugging Face and accept the model's
+  access conditions. The model page requires sharing account contact
+  information. No account credential should be pasted into chat. Check
+  available RAM/VRAM before downloading or running the weights; CPU may be slow.
+  A creator-recorded WAV can be used instead.
 - Do not enable Google Cloud Billing. The YouTube Data API has free quota
   buckets, but uses a Google developer project and OAuth consent. The current
   official quota guide lists up to 100 `videos.insert` calls per day and

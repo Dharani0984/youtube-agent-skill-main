@@ -1,4 +1,5 @@
 """Optional offline Telugu TTS adapter; does not auto-install or call paid APIs."""
+import importlib
 import importlib.util
 import json
 from pathlib import Path
@@ -7,8 +8,29 @@ import wave
 MODEL_ID = "ai4bharat/indic-parler-tts"
 
 
+def _load_tokenizers(model_id, description_encoder_name, tokenizer_class):
+    """Parler needs a transcript tokenizer and a separate description tokenizer."""
+    transcript = tokenizer_class.from_pretrained(model_id, padding_side="left")
+    description = tokenizer_class.from_pretrained(description_encoder_name)
+    return transcript, description
+
+
+def dependency_status():
+    required = ("torch", "transformers", "parler_tts")
+    missing = [name for name in required if importlib.util.find_spec(name) is None]
+    if missing:
+        return {"available": False, "error": "Missing packages: " + ", ".join(missing)}
+    for name in required:
+        try:
+            importlib.import_module(name)
+        except Exception as exc:
+            return {"available": False,
+                    "error": f"{name} import failed ({type(exc).__name__}): {exc}"}
+    return {"available": True, "error": None}
+
+
 def dependencies_available():
-    return all(importlib.util.find_spec(name) is not None for name in ("torch", "transformers", "parler_tts"))
+    return dependency_status()["available"]
 
 
 def synthesize_scenes(scenes, output_path, timeline_path, speaker=None, model_id=None,
@@ -19,16 +41,20 @@ def synthesize_scenes(scenes, output_path, timeline_path, speaker=None, model_id
     profile = load_voice_defaults(profile_path)
     speaker = speaker or profile["tts_speaker_default"]
     model_id = model_id or profile["tts_model"]
-    if not dependencies_available():
-        raise RuntimeError("Offline Telugu TTS‌కు torch, transformers, parler_tts అవసరం; ఏ package auto-install చేయలేదు")
+    status = dependency_status()
+    if not status["available"]:
+        raise RuntimeError("Offline Telugu TTS సిద్ధంగా లేదు: " + status["error"])
     import numpy as np
     import torch
     from parler_tts import ParlerTTSForConditionalGeneration
     from transformers import AutoTokenizer
     model = ParlerTTSForConditionalGeneration.from_pretrained(model_id).to(device)
-    tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side="left")
+    # Parler uses separate tokenizers for the transcript and voice description.
+    tokenizer, description_tokenizer = _load_tokenizers(
+        model_id, model.config.text_encoder._name_or_path, AutoTokenizer
+    )
     description = f"{speaker} speaks Telugu. {profile['tts_delivery']}"
-    desc = tokenizer(description, return_tensors="pt").to(device)
+    desc = description_tokenizer(description, return_tensors="pt").to(device)
     rate, cursor, chunks, segments = int(model.config.sampling_rate), 0.0, [], []
     for index, scene in enumerate(scenes):
         text = scene["narration"].strip()

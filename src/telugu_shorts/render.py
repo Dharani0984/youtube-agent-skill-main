@@ -110,7 +110,9 @@ def render_project(project_dir, manifest, voice_path, music_path=None, music_lic
         filters.append("[voice][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]")
     filter_script = project_dir / "render-filter.txt"
     filter_script.write_text(";\n".join(filters), encoding="utf-8")
-    args += ["-filter_complex_script", str(filter_script), "-map", "[vout]", "-map", "[aout]",
+    # FFmpeg 9 removed the legacy -filter_complex_script option. Keep the
+    # filter graph on disk for review, and pass it using the supported option.
+    args += ["-filter_complex", filter_script.read_text(encoding="utf-8"), "-map", "[vout]", "-map", "[aout]",
              "-c:v", "libx264", "-preset", "medium", "-crf", "21", "-pix_fmt", "yuv420p",
              "-c:a", "aac", "-b:a", "160k", "-t", f"{duration:.3f}", "-movflags", "+faststart", str(output)]
     result = subprocess.run(args, capture_output=True, text=True, encoding="utf-8", errors="replace")

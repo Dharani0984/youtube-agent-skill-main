@@ -5,13 +5,15 @@ from pathlib import Path
 from .captions import make_srt, make_timed_srt
 from .manifest import project_directory, validate_manifest, write_json
 from .visuals import render_ppm
-from .tts import dependencies_available, synthesize_scenes, wav_duration
+from .tts import dependency_status, synthesize_scenes, wav_duration
 
 
 def prepare_project(data, output_root="build/shorts", make_voice=False, speaker=None):
     manifest = validate_manifest(data)
-    if make_voice and not dependencies_available():
-        raise RuntimeError("Offline Telugu TTS dependencies లేవు; ప్రాజెక్ట్ folder సృష్టించలేదు, auto-install చేయలేదు")
+    if make_voice:
+        status = dependency_status()
+        if not status["available"]:
+            raise RuntimeError("Offline Telugu TTS సిద్ధంగా లేదు: " + status["error"])
     root = Path(output_root)
     root.mkdir(parents=True, exist_ok=True)
     project = project_directory(root, manifest["project_id"])

@@ -14,7 +14,7 @@ from .pipeline import prepare_project, read_project
 from .render import render_project
 from .youtube import authorize, upload_approved
 from . import config
-from .tts import dependencies_available
+from .tts import dependency_status
 from .voice import load_voice_defaults
 
 
@@ -58,8 +58,10 @@ def main(argv=None):
                 profile_ok = bool(load_voice_defaults())
             except ValueError as exc:
                 profile_ok = False; print("Voice profile: సమస్య — " + str(exc))
+            tts_status = dependency_status()
             print(json.dumps({"python": platform.python_version(), "ffmpeg_ffprobe": ffmpeg_ok,
-                "local_telugu_tts_dependencies": dependencies_available(), "voice_defaults": profile_ok,
+                "local_telugu_tts_dependencies": tts_status["available"],
+                "local_telugu_tts_error": tts_status["error"], "voice_defaults": profile_ok,
                 "first_tts_use_downloads_model": True}, ensure_ascii=False, indent=2))
         elif args.command == "prepare":
             target = prepare_project(load_manifest(args.manifest), args.output_root, args.tts, args.speaker)
