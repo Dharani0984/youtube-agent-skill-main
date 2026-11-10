@@ -34,6 +34,15 @@ def _read_client(path):
         raise ValueError("Google OAuth desktop client JSON చదవలేకపోయాం") from exc
 
 
+def _client_auth_fields(client):
+    """Return OAuth client parameters, omitting a missing desktop secret."""
+    fields = {"client_id": client["client_id"]}
+    secret = client.get("client_secret")
+    if secret:
+        fields["client_secret"] = secret
+    return fields
+
+
 class _CallbackHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
@@ -67,9 +76,10 @@ def authorize(client_file, token_file, timeout=180):
         server.server_close()
     if result.get("state") != state or not result.get("code"):
         raise PermissionError("OAuth callback ధృవీకరణ కాలేదు లేదా సమయం ముగిసింది")
-    payload = urllib.parse.urlencode({"client_id": client["client_id"], "client_secret": client.get("client_secret", ""),
-        "code": result["code"], "code_verifier": verifier, "redirect_uri": redirect_uri,
-        "grant_type": "authorization_code"}).encode()
+    fields = _client_auth_fields(client)
+    fields.update({"code": result["code"], "code_verifier": verifier, "redirect_uri": redirect_uri,
+                   "grant_type": "authorization_code"})
+    payload = urllib.parse.urlencode(fields).encode()
     token = _post_form(TOKEN_URL, payload)
     if not token.get("refresh_token"):
         raise PermissionError("Google refresh token ఇవ్వలేదు; consent screen/configuration చూడండి")
@@ -83,8 +93,22 @@ def _post_form(url, body):
     try:
         with urllib.request.urlopen(request, timeout=40) as response:
             return json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, json.JSONDecodeError) as exc:
-        raise RuntimeError("Google OAuth token request విఫలమైంది; రహస్య వివరాలు ముద్రించలేదు") from exc
+    except urllib.error.HTTPError as exc:
+        error_code = "unknown_error"
+        try:
+            details = json.loads(exc.read().decode("utf-8"))
+            candidate = details.get("error")
+            if isinstance(candidate, str) and candidate.replace("_", "").isalnum():
+                error_code = candidate[:64]
+        except (UnicodeDecodeError, json.JSONDecodeError, AttributeError):
+            pass
+        raise RuntimeError(
+            f"Google OAuth token అభ్యర్థన విఫలమైంది (HTTP {exc.code}, {error_code}); రహస్యాలు చూపించలేదు"
+        ) from None
+    except (urllib.error.URLError, json.JSONDecodeError):
+        raise RuntimeError(
+            "Google OAuth token అభ్యర్థన విఫలమైంది (network లేదా invalid response); రహస్యాలు చూపించలేదు"
+        ) from None
 
 
 def access_token(client_file, token_file):
@@ -95,8 +119,9 @@ def access_token(client_file, token_file):
         raise PermissionError("DPAPIలో OAuth consent లేదు; ముందుగా authorize చేయండి") from exc
     if token.get("access_token") and token.get("expires_at", 0) > time.time() + 60:
         return token["access_token"]
-    body = urllib.parse.urlencode({"client_id": client["client_id"], "client_secret": client.get("client_secret", ""),
-        "refresh_token": token["refresh_token"], "grant_type": "refresh_token"}).encode()
+    fields = _client_auth_fields(client)
+    fields.update({"refresh_token": token["refresh_token"], "grant_type": "refresh_token"})
+    body = urllib.parse.urlencode(fields).encode()
     refreshed = _post_form(TOKEN_URL, body)
     token.update(refreshed); token["expires_at"] = int(time.time()) + int(token.get("expires_in", 3600))
     secure_store.save(token_file, json.dumps(token).encode("utf-8"))
