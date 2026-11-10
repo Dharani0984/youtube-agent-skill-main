@@ -135,12 +135,9 @@ class LocalPipelineTests(unittest.TestCase):
             self.assertTrue((project / "subtitles-timed.srt").is_file())
 
     def test_ffmpeg_absence_is_reported_not_hidden(self):
-        import shutil
-        if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
-            with self.assertRaisesRegex(RuntimeError, "FFmpeg"): preflight()
-        else:
-            ffmpeg, ffprobe = preflight()
-            self.assertTrue(Path(ffmpeg).is_file()); self.assertTrue(Path(ffprobe).is_file())
+        with patch("telugu_shorts.render.shutil.which", return_value=None):
+            with self.assertRaisesRegex(RuntimeError, "FFmpeg"):
+                preflight()
 
     def test_missing_tts_dependencies_are_reported_without_installing(self):
         unavailable = {"available": False, "error": "Missing packages: torch"}
